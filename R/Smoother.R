@@ -1,106 +1,106 @@
 # Need LinKF function preloaded
 # All must be matrix data type!
-#Z  : T   by p   matrix representing observations
-#X  : T   by s   matrix representing regressors
-#Gam: p+q by q   matrix representing parameters of states (H' F')'
-#Bet: p+q by s   matrix ... parameters of regressors (A' B')'
-#G  : p+q by p+q matrix ... parameters of errors (R' Q')'
-#h0 : q   by 1   matrix ... accurate initial state
-#P0 : q   by q   matrix ... accurate initial state's cov
-#X0 : s   by 1   matrix ... x at time step 0
-#by Y. K. Yang
+#mZ  : iT   by ip   matrix representing observations
+#mX  : iT   by iu   matrix representing regressors
+#Gam: ip+iq by iq   matrix representing parameters of states (H' F')'
+#Bet: ip+iq by iu   matrix ... parameters of regressors (A' B')'
+#mG  : ip+iq by ip+iq matrix ... parameters of errors (R' Q')'
+#h0 : iq   by 1   matrix ... accurate initial state
+#P0 : iq   by iq   matrix ... accurate initial state's cov
+#mX0 : iu   by 1   matrix ... x at time step 0
+#
 #output
 #KF : list       output from LinKF
-#u  : T   by p+q E[eps |Z X]
-#u0 : p+q by 1
-#r  : T   by q
-#r0 : q   by 1
-#e  : T   by p
+#u  : iT   by ip+iq E[eps |Z X]
+#u0 : ip+iq by 1
+#r  : iT   by iq
+#r0 : iq   by 1
+#e  : iT   by ip
 #D  : Tpp array
 #N  : Tqq array
-#N0 : q   by q
-#C  : T(p+q)(p+q) array
-#C0 : p+q  by p+q
-#CN : T(p+q)q array
+#N0 : iq   by iq
+#C  : T(ip+iq)(ip+iq) array
+#C0 : ip+iq  by ip+iq
+#CN : T(ip+iq)iq array
 #L  : Tqq array
-#L0 : q    by q
+#L0 : iq    by iq
 #M  : Tq(p+q) array
-#M0 : q    by p+q
-Smoother<-function(Z,X,Gam,Bet,G,h0,P0,X0)
+#M0 : iq    by ip+iq
+Smoother<-function(mZ,mX,Gam,Bet,mG,h0,P0,mX0)
 {
   
-  KF=LinKF(Z,X,Gam,Bet,G,h0,P0,X0)
+  KF=LinKF(mZ,mX,Gam,Bet,mG,h0,P0,mX0)
   if(class(KF)=="numeric") return(0)
   
-  T=dim(Z)[1]
-  p=dim(Z)[2]
-  q=dim(Gam)[2]
-  s=dim(Bet)[2]
-  F=Gam[(p+1):(p+q),]
-  dim(F)=c(q,q)
-  B=Bet[(p+1):(p+q),]
-  dim(B)=c(q,s)
-  Q=G[(p+1):(p+q),]
-  dim(Q)=c(q,(p+q))
+  iT=dim(mZ)[1]
+  ip=dim(mZ)[2]
+  iq=dim(Gam)[2]
+  iu=dim(Bet)[2]
+  F=Gam[(ip+1):(ip+iq),]
+  dim(F)=c(iq,iq)
+  B=Bet[(ip+1):(ip+iq),]
+  dim(B)=c(iq,iu)
+  Q=mG[(ip+1):(ip+iq),]
+  dim(Q)=c(iq,(ip+iq))
   QQ=Q%*%t(Q)
-  dim(QQ)=c(q,q)
-  H=Gam[1:p,]
-  dim(H)=c(p,q)
-  A=Bet[1:p,]
-  dim(A)=c(p,s)
-  R=G[1:p,]
-  dim(R)=c(p,(p+q))
+  dim(QQ)=c(iq,iq)
+  H=Gam[1:ip,]
+  dim(H)=c(ip,iq)
+  A=Bet[1:ip,]
+  dim(A)=c(ip,iu)
+  R=mG[1:ip,]
+  dim(R)=c(ip,(ip+iq))
   RR=R%*%t(R)
-  dim(RR)=c(p,p)
+  dim(RR)=c(ip,ip)
   
-  e=array(0,dim=c(T,p))
-  r=array(0,dim=c(T,q))
-  u=array(0,dim=c(T,(p+q)))
-  D=array(0,dim=c(T,p,p))
-  N=array(0,dim=c(T,q,q))
-  C=array(0,dim=c(T,(p+q),(p+q)))
-  CN=array(0,dim=c(T,(p+q),q))
-  L=array(0,dim=c(T,q,q))
-  M=array(0,dim=c(T,q,(p+q)))
+  e=array(0,dim=c(iT,ip))
+  r=array(0,dim=c(iT,iq))
+  u=array(0,dim=c(iT,(ip+iq)))
+  D=array(0,dim=c(iT,ip,ip))
+  N=array(0,dim=c(iT,iq,iq))
+  C=array(0,dim=c(iT,(ip+iq),(ip+iq)))
+  CN=array(0,dim=c(iT,(ip+iq),iq))
+  L=array(0,dim=c(iT,iq,iq))
+  M=array(0,dim=c(iT,iq,(ip+iq)))
   
   tool=cbind(rbind(H,F),rbind(R,Q))
-  for(i in T:2){
+  for(i in iT:2){
     fk=F%*%KF$K[i,,]
-    dim(fk)=c(q,p)
+    dim(fk)=c(iq,ip)
     L[i,,]=F-fk%*%H
     M[i,,]=Q-fk%*%R
     SS=solve(KF$S[i,,])
     e[i,]=SS%*%KF$v[i,]-t(fk)%*%r[i,]
     temp=t(tool)%*%c(e[i,],r[i,])
-    r[(i-1),]=temp[1:q,]
-    u[i,]=temp[(q+1):(p+2*q),]
+    r[(i-1),]=temp[1:iq,]
+    u[i,]=temp[(iq+1):(ip+2*iq),]
     D[i,,]=SS+t(fk)%*%N[i,,]%*%fk
     temp=-N[i,,]%*%fk
-    dim(temp)=c(q,p)
+    dim(temp)=c(iq,ip)
     temp=cbind(rbind(D[i,,],temp),rbind(t(temp),N[i,,]))
     temp=t(tool)%*%temp%*%tool
-    N[(i-1),,]=temp[1:q,1:q]
-    C[i,,]=temp[(q+1):(p+2*q),(q+1):(p+2*q)]
-    CN[i,,]=temp[(q+1):(p+2*q),1:q]
+    N[(i-1),,]=temp[1:iq,1:iq]
+    C[i,,]=temp[(iq+1):(ip+2*iq),(iq+1):(ip+2*iq)]
+    CN[i,,]=temp[(iq+1):(ip+2*iq),1:iq]
   }
   
   fk=F%*%KF$K[1,,]
-  dim(fk)=c(q,p)
+  dim(fk)=c(iq,ip)
   M[1,,]=Q-fk%*%R
   L[1,,]=F-fk%*%H
   SS=solve(KF$S[1,,])
   e[1,]=SS%*%KF$v[1,]-t(fk)%*%r[1,]
   temp=t(tool)%*%c(e[1,],r[1,])
-  r0=temp[1:q,]
-  u[1,]=temp[(q+1):(p+2*q),]
+  r0=temp[1:iq,]
+  u[1,]=temp[(iq+1):(ip+2*iq),]
   D[1,,]=SS+t(fk)%*%N[1,,]%*%fk
   temp=-N[1,,]%*%fk
-  dim(temp)=c(q,p)
+  dim(temp)=c(iq,ip)
   temp=cbind(rbind(D[1,,],temp),rbind(t(temp),N[1,,]))
   temp=t(tool)%*%temp%*%tool
-  N0=temp[1:q,1:q]
-  C[1,,]=temp[(q+1):(p+2*q),(q+1):(p+2*q)]
-  CN[1,,]=temp[(q+1):(p+2*q),1:q]
+  N0=temp[1:iq,1:iq]
+  C[1,,]=temp[(iq+1):(ip+2*iq),(iq+1):(ip+2*iq)]
+  CN[1,,]=temp[(iq+1):(ip+2*iq),1:iq]
   
   u0=t(Q)%*%r0
   C0=t(Q)%*%N0%*%Q
