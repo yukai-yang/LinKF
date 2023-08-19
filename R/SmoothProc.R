@@ -1,47 +1,47 @@
 # All must be matrix data type!
-#X  : T   by s   matrix representing regressors
-#Gam: p+q by q   matrix representing parameters of states (H' F')'
-#Bet: p+q by s   matrix ... parameters of regressors (A' B')'
-#G  : p+q by p+q matrix ... parameters of errors (R' Q')'
-#h0 : q   by 1   matrix ... initial state
-#X0 : s   by 1   matrix ... x at time step 0
-#u  : T   by p+q smoothed residuals obtained from Smoothing
-#by Y. K. Yang
+#mX  : iT   by iu   matrix representing regressors
+#Gam: ip+iq by iq   matrix representing parameters of states (H' F')'
+#Bet: ip+iq by iu   matrix ... parameters of regressors (A' B')'
+#mG  : ip+iq by ip+iq matrix ... parameters of errors (R' Q')'
+#h0 : iq   by 1   matrix ... initial state
+#mX0 : iu   by 1   matrix ... x at time step 0
+#u  : iT   by ip+iq smoothed residuals obtained from Smoothing
+#
 #output
-#Z  : T   by p   smoothed observations
-#h  : T   by q   smoothed underlying process
-SmoothProc<-function(X,Gam,Bet,G,h0,X0,u)
+#Z  : iT   by ip   smoothed observations
+#h  : iT   by iq   smoothed underlying process
+SmoothProc<-function(mX,Gam,Bet,mG,h0,mX0,u)
 {
-  T=dim(X)[1]
-  q=dim(Gam)[2]
-  p=dim(Gam)[1]-q
-  s=dim(Bet)[2]
-  if(T<2) return(0)
-  if(dim(X)[2]!=s) return(0)
-  if(dim(Bet)[1]!=(p+q)) return(0)
-  if(dim(G)[1]!=(p+q)) return(0)
-  if(dim(G)[2]!=(p+q)) return(0)
-  if(dim(h0)[1]!=q) return(0)
+  iT=dim(mX)[1]
+  iq=dim(Gam)[2]
+  ip=dim(Gam)[1]-iq
+  iu=dim(Bet)[2]
+  if(iT<2) return(0)
+  if(dim(mX)[2]!=iu) return(0)
+  if(dim(Bet)[1]!=(ip+iq)) return(0)
+  if(dim(mG)[1]!=(ip+iq)) return(0)
+  if(dim(mG)[2]!=(ip+iq)) return(0)
+  if(dim(h0)[1]!=iq) return(0)
   if(dim(h0)[2]!=1) return(0)
-  if(dim(X0)[1]!=s) return(0)
-  if(dim(X0)[2]!=1) return(0)
+  if(dim(mX0)[1]!=iu) return(0)
+  if(dim(mX0)[2]!=1) return(0)
   
   
-  h=array(0,dim=c(T,q))
+  h=array(0,dim=c(iT,iq))
   e=u# smoothed innovations
-  Z=array(0,dim=c(T,p))# data
+  Z=array(0,dim=c(iT,ip))# data
   
   #Start
   
-  temp=c(Gam%*%h0+Bet%*%X0+G%*%rnorm(p+q))
-  h[1,]=temp[(p+1):(p+q)]
-  for(i in 1:(T-1)){
-    temp=c(Gam%*%h[i,]+Bet%*%X[i,]+G%*%e[i,])
-    Z[i,]=temp[1:p]
-    h[(i+1),]=temp[(p+1):(p+q)]
+  temp=c(Gam%*%h0+Bet%*%mX0+mG%*%rnorm(ip+iq))
+  h[1,]=temp[(ip+1):(ip+iq)]
+  for(i in 1:(iT-1)){
+    temp=c(Gam%*%h[i,]+Bet%*%mX[i,]+mG%*%e[i,])
+    Z[i,]=temp[1:ip]
+    h[(i+1),]=temp[(ip+1):(ip+iq)]
   }
-  temp=c(Gam%*%h[T,]+Bet%*%X[T,]+G%*%e[T,])
-  Z[T,]=temp[1:p]
+  temp=c(Gam%*%h[iT,]+Bet%*%mX[iT,]+mG%*%e[iT,])
+  Z[iT,]=temp[1:ip]
   
   return(list(Z=Z,h=h))
 }
