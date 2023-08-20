@@ -11,9 +11,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// mcalc
-List mcalc(const int iT, const int ip, const int iq, const arma::mat& mX, const arma::mat& me, const arma::mat& Gam, const arma::mat& Bet, const arma::mat& mG, const arma::vec& h0, const arma::vec& mX0);
-RcppExport SEXP _LinKF_mcalc(SEXP iTSEXP, SEXP ipSEXP, SEXP iqSEXP, SEXP mXSEXP, SEXP meSEXP, SEXP GamSEXP, SEXP BetSEXP, SEXP mGSEXP, SEXP h0SEXP, SEXP mX0SEXP) {
+// mcalc_sim
+List mcalc_sim(const int iT, const int ip, const int iq, const arma::mat& mX, const arma::mat& me, const arma::mat& Gam, const arma::mat& Bet, const arma::mat& mG, const arma::vec& h0, const arma::vec& mX0);
+RcppExport SEXP _LinKF_mcalc_sim(SEXP iTSEXP, SEXP ipSEXP, SEXP iqSEXP, SEXP mXSEXP, SEXP meSEXP, SEXP GamSEXP, SEXP BetSEXP, SEXP mGSEXP, SEXP h0SEXP, SEXP mX0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -27,13 +27,38 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type mG(mGSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type h0(h0SEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mX0(mX0SEXP);
-    rcpp_result_gen = Rcpp::wrap(mcalc(iT, ip, iq, mX, me, Gam, Bet, mG, h0, mX0));
+    rcpp_result_gen = Rcpp::wrap(mcalc_sim(iT, ip, iq, mX, me, Gam, Bet, mG, h0, mX0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mcalc_kf
+List mcalc_kf(const int iT, const int ip, const int iq, const arma::mat& mZ, const arma::mat& mX, const arma::mat& mF, const arma::mat& mB, const arma::mat& mH, const arma::mat& mA, const arma::mat& RR, const arma::mat& QQ, const arma::vec& h0, const arma::vec& mX0, const arma::mat& P0);
+RcppExport SEXP _LinKF_mcalc_kf(SEXP iTSEXP, SEXP ipSEXP, SEXP iqSEXP, SEXP mZSEXP, SEXP mXSEXP, SEXP mFSEXP, SEXP mBSEXP, SEXP mHSEXP, SEXP mASEXP, SEXP RRSEXP, SEXP QQSEXP, SEXP h0SEXP, SEXP mX0SEXP, SEXP P0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type iT(iTSEXP);
+    Rcpp::traits::input_parameter< const int >::type ip(ipSEXP);
+    Rcpp::traits::input_parameter< const int >::type iq(iqSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mZ(mZSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mX(mXSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mF(mFSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mB(mBSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mH(mHSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mA(mASEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type RR(RRSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type QQ(QQSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type h0(h0SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mX0(mX0SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type P0(P0SEXP);
+    rcpp_result_gen = Rcpp::wrap(mcalc_kf(iT, ip, iq, mZ, mX, mF, mB, mH, mA, RR, QQ, h0, mX0, P0));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LinKF_mcalc", (DL_FUNC) &_LinKF_mcalc, 10},
+    {"_LinKF_mcalc_sim", (DL_FUNC) &_LinKF_mcalc_sim, 10},
+    {"_LinKF_mcalc_kf", (DL_FUNC) &_LinKF_mcalc_kf, 14},
     {NULL, NULL, 0}
 };
 

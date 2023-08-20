@@ -36,36 +36,36 @@ List mcalc_kf(const int iT, const int ip, const int iq, const arma::mat& mZ, con
   // mZ must be ip * iT
   // mX must be iq * iT
   arma::mat h1(iq, iT), h2(iq, iT), mv(ip,iT);
-  arma::cube P1(iT,iq,iq), P2(iT,iq,iq), aS(iT,ip,ip), aK(iT,iq,ip);
+  arma::cube P1(iq,iq,iT), P2(iq,iq,iT), aS(ip,ip,iT), aK(iq,ip,iT);
 
   // Predict
   h1.col(0) = mF * h0 + mB * mX0;
-  P1.row(0) = mF * P0 * mF.t() + QQ;
+  P1.slice(0) = mF * P0 * mF.t() + QQ;
 
   //Update
   mv.col(0) = mZ.col(0) - mH * h1.col(0) - mA * mX.col(0);
-  aS.row(0) = mH * P1.row(0) * mH.t() + RR;
-  aK.row(0) = P1.row(0) * mH.t() * inv_sympd(aS.row(0));
-  h2.col(0) = h1.col(0) + aK.row(0) * mv.col(0);
-  P2.row(0) = (eye(iq,iq) - aK.row(0) * mH ) * P1.row(0);
+  aS.slice(0) = mH * P1.slice(0) * mH.t() + RR;
+  aK.slice(0) = P1.slice(0) * mH.t() * inv_sympd(aS.slice(0));
+  h2.col(0) = h1.col(0) + aK.slice(0) * mv.col(0);
+  P2.slice(0) = (eye(iq,iq) - aK.slice(0) * mH ) * P1.slice(0);
 
   for(int iter=1; iter < iT; iter++){
     // Predict
     h1.col(iter) = mF * h2.col(iter-1) + mB * mX.col(iter-1);
     //h1[i,]=F%*%h2[(i-1),]+B%*%mX[(i-1),]
-    P1.row(iter) = mF * P2.row(iter-1) * mF.t() + QQ;
+    P1.slice(iter) = mF * P2.slice(iter-1) * mF.t() + QQ;
     //P1[i,,]=F%*%P2[(i-1),,]%*%t(F)+QQ
 
     //Update
     mv.col(iter) = mZ.col(iter) - mH * h1.col(iter) - mA * mX.col(iter);
     //v[i,]=mZ[i,]-H%*%h1[i,]-A%*%mX[i,]
-    aS.row(iter) = mH * P1.row(iter) * mH.t() + RR;
+    aS.slice(iter) = mH * P1.slice(iter) * mH.t() + RR;
     //S[i,,]=H%*%P1[i,,]%*%t(H)+RR
-    aK.row(iter) = P1.row(iter) * mH.t() * inv_sympd(aS.row(iter));
+    aK.slice(iter) = P1.slice(iter) * mH.t() * inv_sympd(aS.slice(iter));
     //K[i,,]=P1[i,,]%*%t(H)%*%solve(S[i,,])
-    h2.col(iter) = h1.col(iter) + aK.row(iter) * mv.col(iter);
+    h2.col(iter) = h1.col(iter) + aK.slice(iter) * mv.col(iter);
     //h2[i,]=h1[i,]+c(K[i,,]%*%v[i,])
-    P2.row(iter) = (eye(iq,iq) - aK.row(iter) * mH ) * P1.row(iter);
+    P2.slice(iter) = (eye(iq,iq) - aK.slice(iter) * mH ) * P1.slice(iter);
     //P2[i,,]=(diag(1,iq)-K[i,,]%*%H)%*%P1[i,,]
   }
 

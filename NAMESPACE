@@ -2,5 +2,6 @@ useDynLib(LinKF, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 
 export(LinKF)
+export(LinKFc)
 export(SimKF)
 export(SimKFc)
