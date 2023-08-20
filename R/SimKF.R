@@ -116,5 +116,5 @@ SimKFc <- function(mX,Gam,Bet,mG,h0,mX0)
 
   me=matrix(rnorm((iT+1)*(ip+iq)),ip+iq,iT+1)# innovations
 
-  ret( .Call(`_LinKF_mcalc_sim`,iT, ip, iq, t(mX), me, Gam, Bet, mG, h0, mX0) )
+  return( .Call(`_LinKF_mcalc_sim`,iT, ip, iq, t(mX), me, Gam, Bet, mG, h0, mX0) )
 }
