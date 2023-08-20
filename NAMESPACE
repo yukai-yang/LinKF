@@ -1,6 +1,6 @@
 useDynLib(LinKF, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
 
 export(LinKF)
 export(SimKF)
-export(SimKFc)
