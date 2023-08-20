@@ -47,7 +47,7 @@ List mcalc_kf(const int iT, const int ip, const int iq, const arma::mat& mZ, con
   aS.slice(0) = mH * P1.slice(0) * mH.t() + RR;
   aK.slice(0) = P1.slice(0) * mH.t() * inv_sympd(aS.slice(0));
   h2.col(0) = h1.col(0) + aK.slice(0) * mv.col(0);
-  P2.slice(0) = (eye(iq,iq) - aK.slice(0) * mH ) * P1.slice(0);
+  P2.slice(0) = (arma::eye(iq,iq) - aK.slice(0) * mH ) * P1.slice(0);
 
   for(int iter=1; iter < iT; iter++){
     // Predict
@@ -65,7 +65,7 @@ List mcalc_kf(const int iT, const int ip, const int iq, const arma::mat& mZ, con
     //K[i,,]=P1[i,,]%*%t(H)%*%solve(S[i,,])
     h2.col(iter) = h1.col(iter) + aK.slice(iter) * mv.col(iter);
     //h2[i,]=h1[i,]+c(K[i,,]%*%v[i,])
-    P2.slice(iter) = (eye(iq,iq) - aK.slice(iter) * mH ) * P1.slice(iter);
+    P2.slice(iter) = (arma::eye(iq,iq) - aK.slice(iter) * mH ) * P1.slice(iter);
     //P2[i,,]=(diag(1,iq)-K[i,,]%*%H)%*%P1[i,,]
   }
 
