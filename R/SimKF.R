@@ -46,21 +46,22 @@ SimKF <- function(mX,Gam,Bet,mG,h0,mX0)
 
 
   h=matrix(0,iT,iq)# true states
-  e=matrix(rnorm(iT*(ip+iq)),iT,(ip+iq))# innovations
+  #e=matrix(rnorm(iT*(ip+iq)),iT,(ip+iq))# innovations
+  e=matrix(rnorm((ip+iq)*(iT+1)),ip+iq,iT+1)# innovations
   mZ=matrix(0,iT,ip)# data
 
   #Start
 
-  temp=c(Gam%*%h0+Bet%*%mX0+mG%*%rnorm(ip+iq))
+  temp=c(Gam%*%h0+Bet%*%mX0+mG%*%e[,1])
   h[1,]=temp[(ip+1):(ip+iq)]
 
   for(i in 1:(iT-1)){
-    temp=c(Gam%*%h[i,]+Bet%*%mX[i,]+mG%*%e[i,])
+    temp=c(Gam%*%h[i,]+Bet%*%mX[i,]+mG%*%e[,i+1])
     mZ[i,]=temp[1:ip]
     h[(i+1),]=temp[(ip+1):(ip+iq)]
   }
 
-  temp=c(Gam%*%h[iT,]+Bet%*%mX[iT,]+mG%*%e[iT,])
+  temp=c(Gam%*%h[iT,]+Bet%*%mX[iT,]+mG%*%e[,iT+1])
   mZ[iT,]=temp[1:ip]
 
   return(list(Z=mZ,h=h))
