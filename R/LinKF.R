@@ -63,15 +63,15 @@ LinKF<-function(mZ,mX,Gam,Bet,mG,h0,P0,mX0)
   h2=matrix(0,iT,iq)# h_t|t
   P2=array(0,dim=c(iq,iq,iT))# P_t|t
 
-  F=Gam[(ip+1):(ip+iq),]
-  B=Bet[(ip+1):(ip+iq),]
-  temp=mG[(ip+1):(ip+iq),]
-  dim(temp)=c(iq,(ip+iq))
+  F=Gam[(ip+1):(ip+iq),,drop=FALSE]
+  B=Bet[(ip+1):(ip+iq),,drop=FALSE]
+  temp=mG[(ip+1):(ip+iq),,drop=FALSE]
+  #dim(temp)=c(iq,(ip+iq))
   QQ=temp%*%t(temp)
-  H=Gam[1:ip,]
-  A=Bet[1:ip,]
-  temp=mG[1:ip,]
-  dim(temp)=c(ip,(ip+iq))
+  H=Gam[1:ip,,drop=FALSE]
+  A=Bet[1:ip,,drop=FALSE]
+  temp=mG[1:ip,,drop=FALSE]
+  #dim(temp)=c(ip,(ip+iq))
   RR=temp%*%t(temp)
 
   #Start
@@ -167,15 +167,15 @@ LinKFc <- function(mZ,mX,Gam,Bet,mG,h0,P0,mX0)
   h2=array(0,dim=c(iT,iq))# h_t|t
   P2=array(0,dim=c(iT,iq,iq))# P_t|t
 
-  F=Gam[(ip+1):(ip+iq),]
-  B=Bet[(ip+1):(ip+iq),]
-  temp=mG[(ip+1):(ip+iq),]
-  dim(temp)=c(iq,(ip+iq))
+  F=Gam[(ip+1):(ip+iq),,drop=FALSE]
+  B=Bet[(ip+1):(ip+iq),,drop=FALSE]
+  temp=mG[(ip+1):(ip+iq),,drop=FALSE]
+  #dim(temp)=c(iq,(ip+iq))
   QQ=temp%*%t(temp)
-  H=Gam[1:ip,]
-  A=Bet[1:ip,]
-  temp=mG[1:ip,]
-  dim(temp)=c(ip,(ip+iq))
+  H=Gam[1:ip,,drop=FALSE]
+  A=Bet[1:ip,,drop=FALSE]
+  temp=mG[1:ip,,drop=FALSE]
+  #dim(temp)=c(ip,(ip+iq))
   RR=temp%*%t(temp)
 
   return( .Call(`_LinKF_mcalc_kf`, iT, ip, iq, t(mZ), t(mX), F, B, H, A, RR, QQ, h0, mX0, P0) )
